@@ -9,6 +9,7 @@ export class HomeViewModel {
     // --- Callbacks for View-Level side effects ---
     public onClientConnected: (() => void) | null = null;
     public onClientDisconnected: (() => void) | null = null;
+    public onFrameReceived: ((frame: string) => void) | null = null;
 
     // --- Expose Store State to the View ---
     get settings() {
@@ -47,7 +48,11 @@ export class HomeViewModel {
 
         // Listen for camera stream data
         const unlistenFrame = await CameraStreamService.listenFrame((frame) => {
-            this.store.cameraFrame = frame;
+            if (this.onFrameReceived) {
+                this.onFrameReceived(frame);
+            } else {
+                this.store.cameraFrame = frame;
+            }
         });
 
         this.unlistens.push(unlistenConn, unlistenDisconn, unlistenFrame);

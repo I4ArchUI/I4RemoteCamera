@@ -4,9 +4,9 @@ use local_ip_address::local_ip;
 #[tauri::command]
 fn get_stream_url() -> String {
     if let Ok(ip) = local_ip() {
-        format!("https://{}:8080", ip.to_string())
+        format!("https://{}:4104", ip.to_string())
     } else {
-        "https://localhost:8080".to_string()
+        "https://localhost:4104".to_string()
     }
 }
 
@@ -18,7 +18,7 @@ pub fn run() {
         .setup(|app| {
             let app_handle = app.handle().clone();
             tauri::async_runtime::spawn(async move {
-                server::start_server(app_handle, 8080).await;
+                server::start_server(app_handle, 4104).await;
             });
             Ok(())
         })

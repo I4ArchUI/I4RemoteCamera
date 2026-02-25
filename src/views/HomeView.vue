@@ -2,10 +2,12 @@
 import { HomeViewModel } from '../viewmodels/HomeViewModel';
 import QrcodeVue from 'qrcode.vue';
 import { useToast } from 'primevue/usetoast';
-import { onMounted, onUnmounted } from 'vue';
+import { onMounted, onUnmounted, ref } from 'vue';
 
 const viewModel = new HomeViewModel();
 const toast = useToast();
+const streamImage = ref<HTMLImageElement | null>(null);
+const streamStarted = ref(false);
 
 onMounted(() => {
 	viewModel.onClientConnected = () => {
@@ -14,6 +16,16 @@ onMounted(() => {
 
 	viewModel.onClientDisconnected = () => {
 		toast.add({ severity: 'warn', summary: 'Disconnected', detail: 'Phone disconnected', life: 3000 });
+		streamStarted.value = false;
+	};
+
+	viewModel.onFrameReceived = (frame) => {
+		if (!streamStarted.value) {
+			streamStarted.value = true;
+		}
+		if (streamImage.value) {
+			streamImage.value.src = frame;
+		}
 	};
 
 	viewModel.initService();
@@ -70,8 +82,8 @@ const copyToClipboard = async () => {
 	</div>
 
 	<div v-if="viewModel.isConnected" class="stream-wrapper">
-		<img v-if="viewModel.cameraFrame" :src="viewModel.cameraFrame" class="camera-stream" />
-		<div v-else class="waiting-frame">
+		<img ref="streamImage" v-show="streamStarted" class="camera-stream" />
+		<div v-show="!streamStarted" class="waiting-frame">
 			<div class="waiting-pill">
 				<i class="pi pi-spin pi-spinner waiting-icon"></i>
 				<span>Waiting for video stream...</span>

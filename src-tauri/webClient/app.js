@@ -233,22 +233,50 @@ function startStream() {
         startBtn.innerText = "Stop";
         startBtn.className = "btn-stop";
 
-        streamInterval = setInterval(() => {
-            if (video.readyState === video.HAVE_ENOUGH_DATA) {
-                if (ws.bufferedAmount > 0) {
-                    return;
-                }
+        let lastFrameTime = 0;
+        let isEncoding = false;
 
+        function sendFrame(timestamp) {
+            if (!ws || ws.readyState !== WebSocket.OPEN) return;
+            streamInterval = requestAnimationFrame(sendFrame);
+
+            const frameDelay = 1000 / targetFps;
+            if (timestamp - lastFrameTime < frameDelay) return;
+
+            // Allow larger buffer to avoid dropping frames on slight network jitter
+            // 3MB buffer limit
+            if (ws.bufferedAmount > 3 * 1024 * 1024) return;
+
+            if (video.readyState >= video.HAVE_CURRENT_DATA && !isEncoding) {
                 if (canvas.width !== video.videoWidth || canvas.height !== video.videoHeight) {
                     canvas.width = video.videoWidth;
                     canvas.height = video.videoHeight;
                 }
 
                 context.drawImage(video, 0, 0, canvas.width, canvas.height);
-                const dataUrl = canvas.toDataURL('image/jpeg', 0.4);
-                ws.send(dataUrl);
+                isEncoding = true;
+
+                // Use toBlob for better performance and non-blocking UI
+                canvas.toBlob((blob) => {
+                    if (!ws || ws.readyState !== WebSocket.OPEN) {
+                        isEncoding = false;
+                        return;
+                    }
+
+                    const reader = new FileReader();
+                    reader.onloadend = () => {
+                        if (ws && ws.readyState === WebSocket.OPEN) {
+                            ws.send(reader.result);
+                        }
+                        isEncoding = false;
+                        lastFrameTime = performance.now();
+                    };
+                    reader.readAsDataURL(blob);
+                }, 'image/jpeg', 0.5);
             }
-        }, 1000 / targetFps);
+        }
+
+        streamInterval = requestAnimationFrame(sendFrame);
     };
     ws.onclose = () => {
         stopStream();
@@ -263,7 +291,7 @@ function startStream() {
 }
 
 function stopStream() {
-    if (streamInterval) clearInterval(streamInterval);
+    if (streamInterval) cancelAnimationFrame(streamInterval);
     if (ws) ws.close();
     startBtn.innerText = "Start";
     startBtn.className = "";
