@@ -23,7 +23,6 @@
 
 .layout-content {
     flex: 1;
-    padding: 1.5rem;
     overflow-y: auto;
     display: flex;
     justify-content: center;
