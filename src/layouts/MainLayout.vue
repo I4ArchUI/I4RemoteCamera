@@ -1,28 +1,32 @@
 <script setup lang="ts">
-import AppSidebar from '../components/AppSidebar.vue';
 </script>
 
 <template>
     <div class="layout-container">
-        <AppSidebar />
-        <div class="layout-content">
+        <main class="layout-content">
             <slot></slot>
-        </div>
+        </main>
     </div>
 </template>
 
 <style scoped>
 .layout-container {
     display: flex;
-    height: 100vh;
+    flex-direction: column;
+    min-height: 100vh;
     width: 100vw;
-    overflow: hidden;
     background-color: var(--p-surface-ground);
+    background-image:
+        radial-gradient(at 0% 0%, rgba(var(--p-primary-rgb), 0.05) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(var(--p-primary-rgb), 0.05) 0px, transparent 50%);
 }
 
 .layout-content {
     flex: 1;
-    padding: 2rem;
+    padding: 1.5rem;
     overflow-y: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 </style>

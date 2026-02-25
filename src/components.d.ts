@@ -11,12 +11,12 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
-    AppSidebar: typeof import('./components/AppSidebar.vue')['default']
     Button: typeof import('primevue/button')['default']
     Card: typeof import('primevue/card')['default']
-    Menu: typeof import('primevue/menu')['default']
+    InputText: typeof import('primevue/inputtext')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
-    ToggleSwitch: typeof import('primevue/toggleswitch')['default']
+    Select: typeof import('primevue/select')['default']
+    Toast: typeof import('primevue/toast')['default']
   }
 }

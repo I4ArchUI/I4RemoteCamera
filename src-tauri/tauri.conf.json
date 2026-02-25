@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "i4RemoteCamerai",
+  "productName": "i4RemoteCamera",
   "version": "0.1.0",
-  "identifier": "com.archwl.i4remotecamerai",
+  "identifier": "com.archwl.i4remotecamera",
   "build": {
     "beforeDevCommand": "npm run dev",
     "devUrl": "http://localhost:1420",
@@ -12,9 +12,9 @@
   "app": {
     "windows": [
       {
-        "title": "i4RemoteCamerai",
-        "width": 350,
-        "height": 600,
+        "title": "i4RemoteCamera",
+        "width": 1280,
+        "height": 720,
         "resizable": false,
         "fullscreen": false,
         "decorations": false,
